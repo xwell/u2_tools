@@ -1,4 +1,4 @@
-# autobrr_lb 负载均衡器配置指南
+# qBittorrent 负载均衡器配置指南
 
 ## 概述
 
@@ -17,7 +17,7 @@ cd autobrr_loadbalance
 docker build -t qbittorrent-loadbalancer .
 ```
 
-### 2. 配置 autobrr_lb
+### 2. 配置 qBittorrent 负载均衡器
 
 ```bash
 # 回到 u2_tools 目录
@@ -64,14 +64,14 @@ cp ../autobrr_loadbalance/config.json.example ./autobrr-lb-config/config.json
 }
 ```
 
-### 4. 启动 autobrr_lb 服务
+### 4. 启动 qBittorrent 负载均衡器服务
 
 ```bash
-# 启动 autobrr_lb 服务（使用 profile）
-docker compose --profile autobrr up -d
+# 启动 qBittorrent 负载均衡器服务（使用 profile）
+docker compose --profile qbt-lb up -d
 
 # 或者启动所有服务
-docker compose up -d
+docker compose --profile qbt-lb up -d
 ```
 
 ### 5. 配置 U2 Magic Catcher
@@ -79,10 +79,10 @@ docker compose up -d
 在 `.env` 文件中设置：
 
 ```bash
-# 启用 autobrr_lb 模式
+# 启用 qBittorrent 负载均衡器模式
 U2_USE_AUTOBRR_LB=true
 
-# autobrr_lb 地址（使用容器名）
+# qBittorrent 负载均衡器地址（使用容器名）
 U2_AUTOBRR_LB_URL=http://qbt-loadbalancer:5000
 
 # webhook 路径（与 config.json 中的 webhook_path 一致）
@@ -131,27 +131,30 @@ U2_FALLBACK_TO_LOCAL=true
 ## 管理命令
 
 ```bash
-# 启动 autobrr_lb 服务
-docker compose --profile autobrr up -d
+# 启动 qBittorrent 负载均衡器服务
+docker compose --profile qbt-lb up -d
 
-# 停止 autobrr_lb 服务
-docker compose --profile autobrr down
+# 停止 qBittorrent 负载均衡器服务
+docker compose --profile qbt-lb down
 
-# 查看 autobrr_lb 日志
-docker compose logs -f qbt-loadbalancer
+# 查看 qBittorrent 负载均衡器日志
+docker compose --profile qbt-lb logs -f qbt-loadbalancer
 
-# 重启 autobrr_lb 服务
-docker compose restart qbt-loadbalancer
+# 重启 qBittorrent 负载均衡器服务
+docker compose --profile qbt-lb restart qbt-loadbalancer
+
+# 查看所有服务状态
+docker compose --profile qbt-lb ps
 ```
 
 ## 健康检查
 
 ```bash
-# 检查 autobrr_lb 健康状态
+# 检查 qBittorrent 负载均衡器健康状态
 curl http://localhost:5000/health
 
 # 检查服务状态
-docker compose ps qbt-loadbalancer
+docker compose --profile qbt-lb ps qbt-loadbalancer
 ```
 
 ## 故障排除
@@ -174,10 +177,20 @@ docker compose exec qbt-loadbalancer ping 192.168.1.100
 # 验证端口映射
 
 # 查看日志
-docker compose logs qbt-loadbalancer
+docker compose --profile qbt-lb logs qbt-loadbalancer
 ```
 
-### 3. 调试模式
+### 3. 配置文件错误
+
+```bash
+# 检查配置文件语法
+cat autobrr-lb-config/config.json | python -m json.tool
+
+# 验证配置文件路径
+ls -la autobrr-lb-config/config.json
+```
+
+### 4. 调试模式
 
 在 `config.json` 中设置：
 
@@ -191,10 +204,22 @@ docker compose logs qbt-loadbalancer
 
 ## 与 U2 Magic Catcher 集成
 
-1. **配置 U2 Magic Catcher** 使用 autobrr_lb 模式
+1. **配置 U2 Magic Catcher** 使用 qBittorrent 负载均衡器模式
 2. **设置正确的 webhook 路径** 确保两端配置一致
-3. **启用回退机制** 当 autobrr_lb 不可用时自动回退到本地下载
+3. **启用回退机制** 当负载均衡器不可用时自动回退到本地下载
 4. **监控日志** 确保种子正确推送到负载均衡器
+
+## 目录结构
+
+```
+u2_tools/
+├── autobrr-lb-config/
+│   └── config.json          # qBittorrent 负载均衡器配置文件
+├── autobrr-lb-logs/         # qBittorrent 负载均衡器日志目录
+├── data/                    # U2 Magic Catcher 数据目录
+├── logs/                    # U2 Magic Catcher 日志目录
+└── docker-compose.yml       # Docker Compose 配置
+```
 
 ## 参考资料
 

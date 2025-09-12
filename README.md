@@ -11,7 +11,7 @@
 - 🏥 **健康检查**: HTTP 健康检查接口
 - 📊 **状态监控**: 详细的运行状态和统计信息
 - 🔧 **环境配置**: 支持环境变量配置
-- 🚀 **autobrr_lb 集成**: 支持推送到 autobrr_lb 负载均衡器
+- 🚀 **qBittorrent 负载均衡器集成**: 支持推送到 qBittorrent 负载均衡器
 
 ## 快速开始
 
@@ -87,12 +87,12 @@ docker compose logs -f u2-magic-catcher
 | `U2_SIZE_FILTER` | [0, -1] | 大小过滤 [最小值GB, 最大值GB] |
 | `U2_NAME_FILTER` | - | 名称过滤（逗号分隔） |
 
-### autobrr_lb 配置
+### qBittorrent 负载均衡器配置
 
 | 环境变量 | 默认值 | 说明 |
 |---------|--------|------|
-| `U2_USE_AUTOBRR_LB` | true | 是否使用 autobrr_lb |
-| `U2_AUTOBRR_LB_URL` | http://autobrr-lb:5000 | autobrr_lb 地址 |
+| `U2_USE_AUTOBRR_LB` | true | 是否使用 qBittorrent 负载均衡器 |
+| `U2_AUTOBRR_LB_URL` | http://qbt-loadbalancer:5000 | qBittorrent 负载均衡器地址 |
 | `U2_AUTOBRR_LB_PATH` | /webhook/... | webhook 路径 |
 | `U2_AUTOBRR_LB_CATEGORY` | U2-Magic | 种子分类 |
 
@@ -265,5 +265,5 @@ MIT License
 - ✅ 添加健康检查
 - ✅ 支持环境变量配置
 - ✅ 改进错误处理
-- ✅ 添加 autobrr_lb 集成
+- ✅ 添加 qBittorrent 负载均衡器集成
 - ✅ 修复权限问题
