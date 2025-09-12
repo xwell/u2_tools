@@ -19,15 +19,11 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
     
-    # 资源限制
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-          cpus: '0.5'
-        reservations:
-          memory: 256M
-          cpus: '0.1'
+    # 资源限制（单机 Docker Compose）
+    mem_limit: 1g
+    memswap_limit: 1g
+    cpus: 0.5
+    mem_reservation: 256m
     
     # 健康检查
     healthcheck:
