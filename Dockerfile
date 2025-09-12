@@ -29,15 +29,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY catch_magic.py .
 COPY docker-entrypoint.sh .
 
-# 创建必要的目录
-RUN mkdir -p /app/data/backup /app/data/watch /app/logs
-
-# 设置权限
-RUN chmod +x docker-entrypoint.sh
-
 # 创建非 root 用户
-RUN useradd -m -u 1000 u2user && \
-    chown -R u2user:u2user /app
+RUN useradd -m -u 1000 u2user
+
+# 创建必要的目录并设置权限
+RUN mkdir -p /app/data/backup /app/data/watch /app/logs && \
+    chown -R u2user:u2user /app && \
+    chmod -R 755 /app
+
+# 设置脚本权限
+RUN chmod +x docker-entrypoint.sh
 
 # 切换到非 root 用户
 USER u2user

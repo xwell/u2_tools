@@ -178,19 +178,32 @@ docker compose logs --tail=100 u2-magic-catcher
 
 ### 常见问题
 
-1. **Cookie 无效**
+1. **权限问题**
+   ```
+   错误: Permission denied
+   解决: 运行目录准备脚本
+   ```
+   ```bash
+   # Linux/Mac
+   ./prepare-dirs.sh
+   
+   # Windows
+   prepare-dirs.bat
+   ```
+
+2. **Cookie 无效**
    ```
    错误: 无法访问 U2 网站
    解决: 检查 U2_COOKIES 环境变量是否正确
    ```
 
-2. **内存不足**
+3. **内存不足**
    ```
    错误: 内存使用超过限制
    解决: 增加 U2_MEMORY_LIMIT_MB 或优化过滤条件
    ```
 
-3. **网络超时**
+4. **网络超时**
    ```
    错误: 请求超时
    解决: 增加 U2_REQUEST_TIMEOUT 或检查网络连接
@@ -253,3 +266,4 @@ MIT License
 - ✅ 支持环境变量配置
 - ✅ 改进错误处理
 - ✅ 添加 autobrr_lb 集成
+- ✅ 修复权限问题

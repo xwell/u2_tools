@@ -45,8 +45,10 @@ if ! grep -q "U2_API_TOKEN=" .env && ! grep -q "U2_COOKIES=" .env; then
     exit 1
 fi
 
-# 创建必要的目录
+# 准备目录和权限
+echo "准备目录和权限..."
 mkdir -p data/backup data/watch logs
+chmod 755 data data/backup data/watch logs
 
 # 构建并启动服务
 echo "构建 Docker 镜像..."

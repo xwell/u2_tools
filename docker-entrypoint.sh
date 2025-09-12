@@ -25,11 +25,15 @@ echo "autobrr_lb 模式: ${U2_USE_AUTOBRR_LB:-true}"
 echo "健康检查端口: ${U2_HEALTH_CHECK_PORT:-8080}"
 echo "=================="
 
-# 确保目录存在
-mkdir -p /app/data/backup /app/data/watch /app/logs
-
-# 设置权限
-chmod 755 /app/data/backup /app/data/watch /app/logs
+# 验证目录权限
+echo "验证目录权限..."
+if [ -w "/app/data" ] && [ -w "/app/logs" ]; then
+    echo "✅ 目录权限正常"
+else
+    echo "❌ 目录权限异常，尝试修复..."
+    # 尝试修复权限（如果可能的话）
+    ls -la /app/
+fi
 
 echo "=== 启动 U2 Magic Catcher ==="
 
