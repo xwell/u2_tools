@@ -64,10 +64,17 @@ docker compose logs -f u2-magic-catcher
 
 | 环境变量 | 默认值 | 说明 |
 |---------|--------|------|
-| `U2_API_TOKEN` | - | U2 API Token（推荐） |
-| `U2_COOKIES` | - | U2 网站 Cookie（备选） |
+| `U2_API_TOKEN` | - | U2 API Token（可选，用于获取魔法信息） |
+| `U2_COOKIES` | - | U2 网站 Cookie（**必需**，用于获取种子下载链接） |
 | `U2_INTERVAL` | 120 | 检查间隔（秒） |
 | `U2_UID` | 50096 | 用户 ID（使用 API 时需要） |
+
+**重要说明**：
+- `U2_COOKIES` 是**必需的**，因为获取种子下载链接需要 Cookie 认证
+- `U2_API_TOKEN` 是可选的，如果设置则使用 API 获取魔法信息，否则使用网页爬取
+- Cookie 格式支持两种：
+  - 浏览器格式：`PHPSESSID=aaa; nexusphp_u2=bbb`
+  - JSON 格式：`{"nexusphp_u2": "bbb"}`
 
 ### 下载策略
 

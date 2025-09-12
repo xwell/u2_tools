@@ -4,9 +4,26 @@
 
 ### 1. 配置认证方式
 
-支持两种认证方式，推荐使用 API Token：
+**重要**: Cookie 是**必需的**，因为获取种子下载链接需要 Cookie 认证。API Token 是可选的，用于获取魔法信息。
 
-#### 方式1: API Token（推荐）
+#### 必需: Cookie 配置
+
+1. 登录 U2 网站
+2. 打开浏览器开发者工具（F12）
+3. 在 Network 标签页中找到任意请求
+4. 复制完整的 Cookie 字符串
+
+**格式1: 浏览器 Cookie 字符串格式（推荐）**
+```bash
+U2_COOKIES=PHPSESSID=your_phpsessid; nexusphp_u2=your_nexusphp_u2_cookie
+```
+
+**格式2: JSON 格式**
+```bash
+U2_COOKIES={"nexusphp_u2": "你的cookie值"}
+```
+
+#### 可选: API Token 配置
 
 1. 访问 U2 API 获取 Token
 2. 在 `.env` 文件中设置：
@@ -15,16 +32,7 @@ U2_API_TOKEN=your_api_token_here
 U2_UID=your_user_id
 ```
 
-#### 方式2: Cookie（备选）
-
-1. 登录 U2 网站
-2. 打开浏览器开发者工具（F12）
-3. 在 Network 标签页中找到任意请求
-4. 复制 Cookie 中的 `nexusphp_u2` 值
-5. 在 `.env` 文件中设置：
-```bash
-U2_COOKIES={"nexusphp_u2": "你的cookie值"}
-```
+> **说明**: 如果同时设置了 API Token 和 Cookie，将使用 API 获取魔法信息，Cookie 用于种子下载。
 
 ### 2. 配置环境变量
 
@@ -148,12 +156,16 @@ docker compose exec u2-magic-catcher python -c "import psutil; print(f'内存使
 
 ### 1. 认证问题
 ```bash
-# 检查 API Token 是否正确设置
-docker compose exec u2-magic-catcher python -c "import os; print('API Token:', '已设置' if os.getenv('U2_API_TOKEN') else '未设置')"
-
-# 检查 Cookie 是否正确设置
+# 检查 Cookie 是否正确设置（必需）
 docker compose exec u2-magic-catcher python -c "import os; print('Cookie:', '已设置' if os.getenv('U2_COOKIES') else '未设置')"
+
+# 检查 API Token 是否正确设置（可选）
+docker compose exec u2-magic-catcher python -c "import os; print('API Token:', '已设置' if os.getenv('U2_API_TOKEN') else '未设置')"
 ```
+
+**常见问题**：
+- 如果提示 "缺少必要的 Cookie 配置"，请确保设置了 `U2_COOKIES` 环境变量
+- Cookie 格式错误：请使用 `PHPSESSID=aaa; nexusphp_u2=bbb` 或 `{"nexusphp_u2": "bbb"}` 格式
 
 ### 2. 网络问题
 ```bash

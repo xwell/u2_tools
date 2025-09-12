@@ -38,6 +38,15 @@ def get_env_config(key: str, default: Any = None, type_func: type = str) -> Any:
         elif type_func == dict:
             if value.startswith('{') and value.endswith('}'):
                 return json.loads(value)
+            # 支持 Cookie 字符串格式: "PHPSESSID=aaa; nexusphp_u2=bbb"
+            elif '=' in value and (';' in value or 'nexusphp_u2' in value):
+                cookies = {}
+                for cookie in value.split(';'):
+                    cookie = cookie.strip()
+                    if '=' in cookie:
+                        key, val = cookie.split('=', 1)
+                        cookies[key.strip()] = val.strip()
+                return cookies
             return {}
         else:
             return type_func(value)
@@ -173,14 +182,17 @@ class CatchMagic:
         has_api_token = bool(API_TOKEN)
         has_cookie = bool(COOKIES.get('nexusphp_u2'))
         
-        if not has_api_token and not has_cookie:
-            logger.error("配置错误: 必须设置 U2_API_TOKEN 或 U2_COOKIES 中的至少一种认证方式")
-            logger.error("API 模式: 设置 U2_API_TOKEN 环境变量")
-            logger.error("Cookie 模式: 设置 U2_COOKIES 环境变量，格式: {\"nexusphp_u2\": \"your_cookie\"}")
-            raise ValueError("缺少必要的认证配置")
+        # Cookie 是必需的，因为获取种子下载链接需要 Cookie
+        if not has_cookie:
+            logger.error("配置错误: 必须设置 U2_COOKIES，因为获取种子下载链接需要 Cookie 认证")
+            logger.error("Cookie 格式: PHPSESSID=aaa; nexusphp_u2=bbb")
+            logger.error("或者 JSON 格式: {\"nexusphp_u2\": \"your_cookie\"}")
+            raise ValueError("缺少必要的 Cookie 配置")
         
-        if has_api_token and has_cookie:
-            logger.warning("同时设置了 API_TOKEN 和 COOKIES，将优先使用 API 模式")
+        if has_api_token:
+            logger.info("同时设置了 API_TOKEN 和 COOKIES，将使用 API 获取魔法信息，Cookie 用于种子下载")
+        else:
+            logger.info("使用 Cookie 模式获取魔法信息和种子下载")
         
         # 检查必要的目录权限
         try:
@@ -223,11 +235,12 @@ class CatchMagic:
         """显示当前配置模式"""
         # 显示数据获取方式
         if API_TOKEN:
-            logger.info(f"=== API 模式已启用 ===")
+            logger.info(f"=== API + Cookie 混合模式 ===")
             logger.info(f"API Token: {'已设置' if API_TOKEN else '未设置'}")
             logger.info(f"用户 ID: {UID}")
+            logger.info(f"Cookie: {'已设置' if COOKIES.get('nexusphp_u2') else '未设置'}")
         else:
-            logger.info(f"=== 网页爬取模式 ===")
+            logger.info(f"=== Cookie 模式 ===")
             logger.info(f"Cookie: {'已设置' if COOKIES.get('nexusphp_u2') else '未设置'}")
         
         # 显示下载方式
