@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  u2-magic-catcher:
+    build: .
+    container_name: u2-magic-catcher
+    restart: unless-stopped
+    
+    # 环境变量配置（从 .env 文件读取）
+    env_file:
+      - .env
+    
+    # 端口映射
+    ports:
+      - "8080:8080"  # 健康检查端口
+    
+    # 卷挂载
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+    
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # 网络配置
+    networks:
+      - u2-network
+
+  # 可选：autobrr_lb 服务（需要本地构建）
+  # 使用前请先克隆并构建 autobrr_loadbalance 项目
+  # git clone https://github.com/guowanghushifu/autobrr_loadbalance.git
+  # cd autobrr_loadbalance && docker build -t qbittorrent-loadbalancer .
+  autobrr-lb:
+    image: qbittorrent-loadbalancer  # 本地构建的镜像
+    container_name: qbt-loadbalancer
+    restart: unless-stopped
+    ports:
+      - "5000:5000"  # Webhook 端口
+    volumes:
+      - ./autobrr-lb-config:/app/config.json:rw  # 配置文件
+      - ./autobrr-lb-logs:/app/logs:rw  # 日志目录
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TZ=Asia/Shanghai
+    networks:
+      - u2-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    profiles:
+      - autobrr  # 使用 profile 控制是否启动
+
+networks:
+  u2-network:
+    driver: bridge
+
+volumes:
+  u2-data:
+  u2-logs:
