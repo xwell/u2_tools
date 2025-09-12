@@ -34,6 +34,13 @@ def get_env_config(key: str, default: Any = None, type_func: type = str) -> Any:
         if type_func == bool:
             return value.lower() in ('true', '1', 'yes', 'on')
         elif type_func == list:
+            # 尝试解析为 JSON 数组
+            if value.startswith('[') and value.endswith(']'):
+                try:
+                    return json.loads(value)
+                except json.JSONDecodeError:
+                    pass
+            # 否则按逗号分割
             return [item.strip() for item in value.split(',') if item.strip()]
         elif type_func == dict:
             if value.startswith('{') and value.endswith('}'):
