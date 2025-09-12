@@ -25,14 +25,34 @@ echo "autobrr_lb 模式: ${U2_USE_AUTOBRR_LB:-true}"
 echo "健康检查端口: ${U2_HEALTH_CHECK_PORT:-8080}"
 echo "=================="
 
+# 修复目录权限（因为卷挂载可能覆盖了权限）
+echo "修复目录权限..."
+if [ -d "/app/data" ]; then
+    # 确保 data 目录及其子目录存在且可写
+    mkdir -p /app/data/backup /app/data/watch
+    # 尝试修复权限（如果可能的话）
+    chmod 755 /app/data /app/data/backup /app/data/watch 2>/dev/null || true
+fi
+
+if [ -d "/app/logs" ]; then
+    # 确保 logs 目录可写
+    chmod 755 /app/logs 2>/dev/null || true
+fi
+
 # 验证目录权限
 echo "验证目录权限..."
 if [ -w "/app/data" ] && [ -w "/app/logs" ]; then
     echo "✅ 目录权限正常"
 else
-    echo "❌ 目录权限异常，尝试修复..."
-    # 尝试修复权限（如果可能的话）
-    ls -la /app/
+    echo "❌ 目录权限异常"
+    echo "目录信息:"
+    ls -la /app/ | grep -E "(data|logs)"
+    echo ""
+    echo "尝试使用临时目录..."
+    # 如果无法写入，使用临时目录
+    export U2_LOG_PATH="/tmp/catch_magic.log"
+    export U2_DATA_PATH="/tmp/catch_magic.data.txt"
+    echo "使用临时目录: $U2_LOG_PATH"
 fi
 
 echo "=== 启动 U2 Magic Catcher ==="

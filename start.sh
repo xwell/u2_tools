@@ -48,7 +48,26 @@ fi
 # 准备目录和权限
 echo "准备目录和权限..."
 mkdir -p data/backup data/watch logs
+
+# 设置目录权限（确保容器内用户 1000:1000 可以访问）
 chmod 755 data data/backup data/watch logs
+
+# 获取当前用户的 UID 和 GID
+USER_ID=$(id -u)
+GROUP_ID=$(id -g)
+
+echo "当前用户: $(whoami) (UID: $USER_ID, GID: $GROUP_ID)"
+echo "容器用户: u2user (UID: 1000, GID: 1000)"
+
+# 如果当前用户不是 root，尝试设置目录所有者
+if [ "$USER_ID" != "0" ]; then
+    echo "设置目录所有者..."
+    chown -R $USER_ID:$GROUP_ID data logs 2>/dev/null || {
+        echo "警告: 无法设置目录所有者，可能需要 sudo 权限"
+        echo "如果遇到权限问题，请运行:"
+        echo "  sudo chown -R $USER_ID:$GROUP_ID data logs"
+    }
+fi
 
 # 构建并启动服务
 echo "构建 Docker 镜像..."
