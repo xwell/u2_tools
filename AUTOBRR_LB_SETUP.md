@@ -24,15 +24,15 @@ docker build -t qbittorrent-loadbalancer .
 cd ../u2_tools
 
 # 创建配置目录
-mkdir -p autobrr-lb-config autobrr-lb-logs
+mkdir -p qbt-loadbalancer-config qbt-loadbalancer-logs
 
 # 复制配置模板
-cp ../autobrr_loadbalance/config.json.example ./autobrr-lb-config/config.json
+cp ../autobrr_loadbalance/config.json.example ./qbt-loadbalancer-config/config.json
 ```
 
 ### 3. 编辑配置文件
 
-编辑 `autobrr-lb-config/config.json`：
+编辑 `qbt-loadbalancer-config/config.json`：
 
 ```json
 {
@@ -184,10 +184,10 @@ docker compose --profile qbt-lb logs qbt-loadbalancer
 
 ```bash
 # 检查配置文件语法
-cat autobrr-lb-config/config.json | python -m json.tool
+cat qbt-loadbalancer-config/config.json | python -m json.tool
 
 # 验证配置文件路径
-ls -la autobrr-lb-config/config.json
+ls -la qbt-loadbalancer-config/config.json
 ```
 
 ### 4. 调试模式
@@ -213,9 +213,9 @@ ls -la autobrr-lb-config/config.json
 
 ```
 u2_tools/
-├── autobrr-lb-config/
+├── qbt-loadbalancer-config/
 │   └── config.json          # qBittorrent 负载均衡器配置文件
-├── autobrr-lb-logs/         # qBittorrent 负载均衡器日志目录
+├── qbt-loadbalancer-logs/         # qBittorrent 负载均衡器日志目录
 ├── data/                    # U2 Magic Catcher 数据目录
 ├── logs/                    # U2 Magic Catcher 日志目录
 └── docker-compose.yml       # Docker Compose 配置
