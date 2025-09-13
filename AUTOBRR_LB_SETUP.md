@@ -209,6 +209,59 @@ ls -la qbt-loadbalancer-config/config.json
 3. **启用回退机制** 当负载均衡器不可用时自动回退到本地下载
 4. **监控日志** 确保种子正确推送到负载均衡器
 
+### 高级配置选项
+
+U2 Magic Catcher 支持以下高级配置，这些参数会传递给 qBittorrent 负载均衡器：
+
+#### 速度限制配置
+
+```bash
+# 下载限速（可选）
+# 支持单位：K, KB, KiB, M, MB, MiB, G, GB, GiB /s
+U2_AUTOBRR_LB_DL_LIMIT=5MB/s
+
+# 上传限速（可选）
+U2_AUTOBRR_LB_UP_LIMIT=1MB/s
+```
+
+#### 保存路径配置
+
+```bash
+# 自定义保存路径（可选）
+U2_AUTOBRR_LB_SAVEPATH=/downloads/TV
+```
+
+#### 完整示例
+
+```bash
+# 基础配置
+U2_USE_AUTOBRR_LB=true
+U2_AUTOBRR_LB_URL=http://qbt-loadbalancer:5000
+U2_AUTOBRR_LB_CATEGORY=U2-Magic
+
+# 高级配置
+U2_AUTOBRR_LB_DL_LIMIT=10MB/s
+U2_AUTOBRR_LB_UP_LIMIT=2MB/s
+U2_AUTOBRR_LB_SAVEPATH=/downloads/Anime
+
+# 回退配置
+U2_FALLBACK_TO_LOCAL=true
+```
+
+这些配置会生成如下的 webhook payload：
+
+```json
+{
+  "release_name": "种子名称",
+  "indexer": "U2-DMHY",
+  "download_url": "种子下载链接",
+  "category": "U2-Magic",
+  "dl_limit": "10MB/s",
+  "up_limit": "2MB/s",
+  "savepath": "/downloads/Anime"
+}
+```
+
 ## 目录结构
 
 ```

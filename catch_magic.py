@@ -115,6 +115,11 @@ AUTOBRR_LB_CATEGORY = get_env_config('U2_AUTOBRR_LB_CATEGORY', 'U2-Magic', str)
 AUTOBRR_LB_TIMEOUT = get_env_config('U2_AUTOBRR_LB_TIMEOUT', 10, int)
 FALLBACK_TO_LOCAL = get_env_config('U2_FALLBACK_TO_LOCAL', True, bool)
 
+# autobrr_lb 高级配置（可选）
+AUTOBRR_LB_DL_LIMIT = get_env_config('U2_AUTOBRR_LB_DL_LIMIT', '', str)  # 下载限速，如 "5MB/s"
+AUTOBRR_LB_UP_LIMIT = get_env_config('U2_AUTOBRR_LB_UP_LIMIT', '', str)  # 上传限速，如 "1MB/s"
+AUTOBRR_LB_SAVEPATH = get_env_config('U2_AUTOBRR_LB_SAVEPATH', '', str)  # 保存路径，如 "/downloads/TV"
+
 # 健康检查配置
 HEALTH_CHECK_PORT = get_env_config('U2_HEALTH_CHECK_PORT', 8080, int)
 HEALTH_CHECK_PATH = get_env_config('U2_HEALTH_CHECK_PATH', '/health', str)
@@ -257,6 +262,16 @@ class CatchMagic:
             logger.info(f"Webhook 路径: {AUTOBRR_LB_PATH}")
             logger.info(f"种子分类: {AUTOBRR_LB_CATEGORY}")
             logger.info(f"回退机制: {'启用' if FALLBACK_TO_LOCAL else '禁用'}")
+            
+            # 显示高级配置
+            if AUTOBRR_LB_DL_LIMIT or AUTOBRR_LB_UP_LIMIT or AUTOBRR_LB_SAVEPATH:
+                logger.info(f"--- 高级配置 ---")
+                if AUTOBRR_LB_DL_LIMIT:
+                    logger.info(f"下载限速: {AUTOBRR_LB_DL_LIMIT}")
+                if AUTOBRR_LB_UP_LIMIT:
+                    logger.info(f"上传限速: {AUTOBRR_LB_UP_LIMIT}")
+                if AUTOBRR_LB_SAVEPATH:
+                    logger.info(f"保存路径: {AUTOBRR_LB_SAVEPATH}")
         else:
             logger.info(f"=== 本地下载模式 ===")
             logger.info(f"备份目录: {BK_DIR}")
@@ -387,6 +402,14 @@ class CatchMagic:
                 'indexer': 'U2-DMHY',
                 'category': AUTOBRR_LB_CATEGORY
             }
+            
+            # 添加可选的高级配置
+            if AUTOBRR_LB_DL_LIMIT:
+                payload['dl_limit'] = AUTOBRR_LB_DL_LIMIT
+            if AUTOBRR_LB_UP_LIMIT:
+                payload['up_limit'] = AUTOBRR_LB_UP_LIMIT
+            if AUTOBRR_LB_SAVEPATH:
+                payload['savepath'] = AUTOBRR_LB_SAVEPATH
             
             response = requests.post(
                 f'{AUTOBRR_LB_URL}{AUTOBRR_LB_PATH}',

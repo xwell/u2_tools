@@ -102,6 +102,9 @@ docker compose logs -f u2-magic-catcher
 | `U2_AUTOBRR_LB_URL` | http://qbt-loadbalancer:5000 | qBittorrent 负载均衡器地址 |
 | `U2_AUTOBRR_LB_PATH` | /webhook/... | webhook 路径 |
 | `U2_AUTOBRR_LB_CATEGORY` | U2-Magic | 种子分类 |
+| `U2_AUTOBRR_LB_DL_LIMIT` | - | 下载限速（如：5MB/s） |
+| `U2_AUTOBRR_LB_UP_LIMIT` | - | 上传限速（如：1MB/s） |
+| `U2_AUTOBRR_LB_SAVEPATH` | - | 保存路径（如：/downloads/TV） |
 
 ## 运行模式
 

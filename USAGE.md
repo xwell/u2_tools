@@ -120,10 +120,20 @@ U2_NAME_FILTER=BDRip
 U2_USE_AUTOBRR_LB=true
 
 # autobrr_lb 地址
-U2_AUTOBRR_LB_URL=http://autobrr-lb:5000
+U2_AUTOBRR_LB_URL=http://qbt-loadbalancer:5000
 
 # 推送失败时回退到本地下载
 U2_FALLBACK_TO_LOCAL=true
+
+# 高级配置（可选）
+# 下载限速，支持单位：K, KB, KiB, M, MB, MiB, G, GB, GiB /s
+U2_AUTOBRR_LB_DL_LIMIT=5MB/s
+
+# 上传限速
+U2_AUTOBRR_LB_UP_LIMIT=1MB/s
+
+# 保存路径
+U2_AUTOBRR_LB_SAVEPATH=/downloads/TV
 ```
 
 ## 监控和调试
