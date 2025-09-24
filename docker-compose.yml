@@ -49,8 +49,8 @@ services:
     ports:
       - "5000:5000"  # Webhook 端口
     volumes:
-      - ./autobrr-lb-config/config.json:/app/config.json:rw  # 配置文件
-      - ./autobrr-lb-logs:/app/logs:rw  # 日志目录
+      - ./qbt-loadbalancer-config/config.json:/app/config.json:rw  # 配置文件
+      - ./qbt-loadbalancer-logs:/app/logs:rw  # 日志目录
     environment:
       - PYTHONUNBUFFERED=1
       - TZ=Asia/Shanghai
