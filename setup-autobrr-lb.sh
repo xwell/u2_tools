@@ -10,7 +10,7 @@ echo "=== qBittorrent 负载均衡器快速设置脚本 ==="
 if ! docker images | grep -q "qbittorrent-loadbalancer"; then
     echo "❌ 未找到 qbittorrent-loadbalancer 镜像"
     echo "请先构建镜像："
-    echo "  git clone https://github.com/guowanghushifu/autobrr_loadbalance.git"
+    echo "  git clone https://github.com/xwell/autobrr_loadbalance.git"
     echo "  cd autobrr_loadbalance && docker build -t qbittorrent-loadbalancer ."
     exit 1
 fi
