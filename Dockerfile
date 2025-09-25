@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV TZ=Asia/Shanghai
 
-# 安装系统依赖
+# 安装系统依赖（包含 gosu 用于降权运行）
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     libxslt-dev \
     libffi-dev \
     libssl-dev \
+    gosu \
     && rm -rf /var/lib/apt/lists/*
 
 # 复制依赖文件
@@ -29,7 +30,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY catch_magic.py .
 COPY docker-entrypoint.sh .
 
-# 创建非 root 用户
+# 创建非 root 用户（默认 uid/gid 为 1000，可在入口脚本中动态修改）
 RUN useradd -m -u 1000 u2user
 
 # 创建必要的目录并设置权限
@@ -40,8 +41,8 @@ RUN mkdir -p /app/data/backup /app/data/watch /app/logs && \
 # 设置脚本权限
 RUN chmod +x docker-entrypoint.sh
 
-# 切换到非 root 用户
-USER u2user
+# 以 root 运行，入口脚本负责修复权限并降权
+# USER u2user
 
 # 暴露健康检查端口
 EXPOSE 8080

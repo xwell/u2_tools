@@ -3,6 +3,10 @@
 # Docker 启动脚本
 set -e
 
+# 允许通过环境变量自定义运行用户/组（默认 1000:1000）
+APP_UID=${APP_UID:-1000}
+APP_GID=${APP_GID:-1000}
+
 echo "=== U2 Magic Catcher 启动脚本 ==="
 echo "时间: $(date)"
 echo "用户: $(whoami)"
@@ -25,18 +29,29 @@ echo "autobrr_lb 模式: ${U2_USE_AUTOBRR_LB:-true}"
 echo "健康检查端口: ${U2_HEALTH_CHECK_PORT:-8080}"
 echo "=================="
 
-# 修复目录权限（因为卷挂载可能覆盖了权限）
 echo "修复目录权限..."
-if [ -d "/app/data" ]; then
-    # 确保 data 目录及其子目录存在且可写
-    mkdir -p /app/data/backup /app/data/watch
-    # 尝试修复权限（如果可能的话）
-    chmod 755 /app/data /app/data/backup /app/data/watch 2>/dev/null || true
-fi
+# 如果容器以 root 启动，则尝试对挂载目录执行 chown，避免宿主机绑定目录为 root:root 导致无法写入
+if [ "$(id -u)" = "0" ]; then
+    # 如果指定了 APP_GID，确保系统内存在对应组
+    if ! getent group ${APP_GID} >/dev/null 2>&1; then
+        groupadd -g ${APP_GID} u2group || true
+    fi
+    # 确保 u2user 的 uid/gid 与期望一致
+    if [ "$(id -u u2user)" != "${APP_UID}" ]; then
+        usermod -u ${APP_UID} u2user || true
+    fi
+    if [ "$(id -g u2user)" != "${APP_GID}" ]; then
+        usermod -g ${APP_GID} u2user || true
+    fi
 
-if [ -d "/app/logs" ]; then
-    # 确保 logs 目录可写
-    chmod 755 /app/logs 2>/dev/null || true
+    # 创建目录并修正属主
+    mkdir -p /app/data/backup /app/data/watch /app/logs
+    chown -R ${APP_UID}:${APP_GID} /app/data /app/logs 2>/dev/null || true
+    chmod -R u+rwX,g+rwX /app/data /app/logs 2>/dev/null || true
+else
+    # 非 root 时尽力创建子目录与放宽权限
+    mkdir -p /app/data/backup /app/data/watch /app/logs 2>/dev/null || true
+    chmod -R u+rwX,g+rwX /app/data /app/logs 2>/dev/null || true
 fi
 
 # 验证目录权限
@@ -46,7 +61,7 @@ if [ -w "/app/data" ] && [ -w "/app/logs" ]; then
 else
     echo "❌ 目录权限异常"
     echo "目录信息:"
-    ls -la /app/ | grep -E "(data|logs)"
+    ls -ld /app/data /app/logs 2>/dev/null || true
     echo ""
     echo "尝试使用临时目录..."
     # 如果无法写入，使用临时目录
@@ -57,5 +72,9 @@ fi
 
 echo "=== 启动 U2 Magic Catcher ==="
 
-# 执行传入的命令
-exec "$@"
+# 使用 gosu 将权限降至非 root 用户后启动主进程
+if [ "$(id -u)" = "0" ]; then
+    exec gosu ${APP_UID}:${APP_GID} "$@"
+else
+    exec "$@"
+fi

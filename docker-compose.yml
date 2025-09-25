@@ -8,8 +8,7 @@ services:
     env_file:
       - .env
     
-    # 用户配置（解决权限问题）
-    user: "1000:1000"
+    # 让入口脚本以 root 自愈权限后降权运行
     
     # 端口映射
     ports:
